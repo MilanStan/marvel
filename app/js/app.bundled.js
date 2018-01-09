@@ -70,7 +70,26 @@
 "use strict";
 
 
-var _dataModule = __webpack_require__(1);
+var _uiModule = __webpack_require__(1);
+
+var _uiModule2 = _interopRequireDefault(_uiModule);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_uiModule2.default.Init();
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _dataModule = __webpack_require__(2);
 
 var _dataModule2 = _interopRequireDefault(_dataModule);
 
@@ -112,7 +131,7 @@ var UIController = function (data) {
     //method for getting background image
     var getImage = function getImage(thumbnail) {
         var output = '';
-        output = "\n        background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        @media (min-width:481px){\n            background-image:url(\"" + thumbnail.path + "/landscape_amazing." + thumbnail.extension + "\");\n        }\n        @media (min-width:992px){\n            background-image:url(\"" + thumbnail.path + "/landscape_incredible." + thumbnail.extension + "\");\n        }\n        @media (min-width:1201px){\n            background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        }\n        ";
+        output = "\n        background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        ";
         return output;
     };
     //change title
@@ -147,19 +166,15 @@ var UIController = function (data) {
         changeBookmarkStatus: function changeBookmarkStatus() {
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.parentNode.classList.contains(DOMstrings.bookmark)) {
-                    //console.log("Kliknuta je zvezda");
                     var currentStar = e.target.parentNode;
                     var id = parseInt(currentStar.getAttribute('data-id'));
-                    //console.log(id);
                     var isBookmarked = currentStar.getAttribute('data-isbook') === "true" ? true : false;
-                    //console.log(isBookmarked);
                     if (!isBookmarked) {
                         var name = currentStar.getAttribute('data-name');
                         var thumbnail = {
                             path: currentStar.getAttribute('data-path'),
                             extension: currentStar.getAttribute('data-extension')
                         };
-                        //console.log(name, thumbnail);
                         data.makeSavedCharacter(id, name, thumbnail, true);
                         currentStar.setAttribute('data-isbook', 'true');
                         currentStar.innerHTML = '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">';
@@ -212,22 +227,10 @@ var UIController = function (data) {
     console.log(data);
 }(_dataModule2.default);
 
-//PROBA
-//console.log(dataController.urlData);
-//dataController.loadAjax("me", UIController.printItems);
-//console.log(dataController.urlData);
-//console.log(dataController.getSavedItems);
-//dataController.makeSavedCharacter(1011241, "Menace", "slika");
-//dataController.makeSavedCharacter(1011099, "Menace", {path:"slika",extension:"jpg"});
-//dataController.loadSaved();
-/* UIController.events.changeBookmarkStatus();
-UIController.events.typeSearchCharacter();
-console.log("stampaju se objekti");
-UIController.events.loadDocument(); */
-UIController.Init();
+exports.default = UIController;
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -252,8 +255,8 @@ var dataController = function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: 12, //"limit=20&",
-        offset: 0, //"offset=0&",
+        limit: 12,
+        offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
     //url data if have pagination
@@ -270,12 +273,7 @@ var dataController = function () {
     };var makeUrl = function makeUrl(prefix) {
         urlData.prefix = prefix + "&";
         var urlAddress = '';
-        /* for (let m in urlData) {
-            if (urlData.hasOwnProperty(m)) {
-                urlAddress += urlData[m];
-            }
-        } */
-        //console.log(urlAddress);
+
         urlAddress = "" + urlData.baseUrl + urlData.subject + urlData.nameStartText + urlData.prefix + "limit=" + urlData.limit + "&offset=" + urlData.offset + "&" + urlData.apikey;
         console.log(urlAddress);
         return urlAddress;
@@ -327,9 +325,7 @@ var dataController = function () {
 
                 savedItems.push(new Character(id, name, thumbnail, isBookmarked));
             });
-            //savedItems.push(new Character(id, name, thumbnail));
             console.log("Snimljeni objekti:");
-            //console.log(Array.isArray(savedItems));
             console.log(savedItems);
         } else {
             console.log("there aren't saved characters");
@@ -338,7 +334,6 @@ var dataController = function () {
     };
     //make bookmarked Character object
     var makeSavedCharacter = function makeSavedCharacter(id, name, thumbnail, isBook) {
-        //id=id.toString();
         savedItems.push(new Character(id, name, thumbnail, isBook));
         if (typeof Storage !== "undefined") {
             localStorage.setItem("marvel", JSON.stringify(savedItems));

@@ -11,8 +11,8 @@ var dataController = (function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: 12,//"limit=20&",
-        offset: 0,//"offset=0&",
+        limit: 12,
+        offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
     //url data if have pagination
@@ -30,12 +30,7 @@ var dataController = (function () {
     var makeUrl = function (prefix) {
         urlData.prefix = `${prefix}&`;
         let urlAddress = '';
-        /* for (let m in urlData) {
-            if (urlData.hasOwnProperty(m)) {
-                urlAddress += urlData[m];
-            }
-        } */
-        //console.log(urlAddress);
+       
         urlAddress=`${urlData.baseUrl}${urlData.subject}${urlData.nameStartText}${urlData.prefix}limit=${urlData.limit}&offset=${urlData.offset}&${urlData.apikey}`;
         console.log(urlAddress);
         return urlAddress;
@@ -86,9 +81,7 @@ var dataController = (function () {
                 } = current;
                 savedItems.push(new Character(id, name, thumbnail,isBookmarked));
             });
-            //savedItems.push(new Character(id, name, thumbnail));
             console.log("Snimljeni objekti:");
-            //console.log(Array.isArray(savedItems));
             console.log(savedItems);
         } else {
             console.log("there aren't saved characters");
@@ -97,7 +90,6 @@ var dataController = (function () {
     };
     //make bookmarked Character object
     var makeSavedCharacter = function (id, name, thumbnail, isBook) {
-        //id=id.toString();
         savedItems.push(new Character(id, name, thumbnail, isBook));
         if (typeof (Storage) !== "undefined") {
             localStorage.setItem("marvel", JSON.stringify(savedItems));
