@@ -12,7 +12,7 @@ var webpack= require('webpack');
 // Start browserSync server
 gulp.task('browserSync', function() {
   browserSync.init({
-    proxy   : "http://localhost:8080/marvel/app"
+    proxy   : "http://localhost:8080/marvel"
   })
 })
 //Sass, autoprefixer, browsersync

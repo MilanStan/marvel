@@ -70,7 +70,128 @@
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _dataModule = __webpack_require__(1);
+
+var _dataModule2 = _interopRequireDefault(_dataModule);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var UIController = function (data) {
+    //dom strings
+    var DOMstrings = {
+        title: "title-container",
+        search: "search-input",
+        mainContainer: "main-container",
+        mainWrapper: "main-wrapper",
+        itemWrapper: "item-wrapper",
+        bookmark: "bookmark"
+    };
+    //method for printing character items
+    var printItems = function printItems(charactersArray) {
+        var output = '';
+        charactersArray.forEach(function (element) {
+            output += printItem(element);
+        });
+        console.log("Izvršeno print items");
+        console.log(output);
+        document.getElementsByClassName(DOMstrings.mainWrapper)[0].innerHTML = output;
+        //return output;
+    };
+    //method for printing one item
+    var printItem = function printItem(characterItem) {
+        var output = "<div class=\"item-wrapper\">\n            <div class=\"image-wrapper\" style='" + getImage(characterItem.thumbnail) + "'></div>\n            <div class=\"name\">" + characterItem.name + "</div>\n            <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n                " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true">') + "\n                </span>\n            </div>\n        </div>";
+        return output;
+    };
+    //method for getting background image
+    var getImage = function getImage(thumbnail) {
+        var output = '';
+        output = "\n        background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        @media (min-width:481px){\n            background-image:url(\"" + thumbnail.path + "/landscape_amazing." + thumbnail.extension + "\");\n        }\n        @media (min-width:992px){\n            background-image:url(\"" + thumbnail.path + "/landscape_incredible." + thumbnail.extension + "\");\n        }\n        @media (min-width:1201px){\n            background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        }\n        ";
+        return output;
+    };
+
+    var Events = {
+        changeBookmarkStatus: function changeBookmarkStatus() {
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.parentNode.classList.contains(DOMstrings.bookmark)) {
+                    console.log("Kliknuta je zvezda");
+                    var currentStar = e.target.parentNode;
+                    var id = parseInt(currentStar.getAttribute('data-id'));
+                    console.log(id);
+                    var isBookmarked = currentStar.getAttribute('data-isbook') === "true" ? true : false;
+                    console.log(isBookmarked);
+                    if (!isBookmarked) {
+                        var name = currentStar.getAttribute('data-name');
+                        var thumbnail = {
+                            path: currentStar.getAttribute('data-path'),
+                            extension: currentStar.getAttribute('data-extension')
+                        };
+                        console.log(name, thumbnail);
+                        data.makeSavedCharacter(id, name, thumbnail);
+                        currentStar.setAttribute('data-isbook', 'true');
+                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star" aria-hidden="true">';
+                    } else {
+                        data.removeSavedCharacter(id);
+                        currentStar.setAttribute('data-isbook', 'false');
+                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star-empty" aria-hidden="true">';
+                    }
+                }
+            });
+        },
+        typeSearchCharacter: function typeSearchCharacter() {
+            var type;
+            var searchEl = document.getElementsByClassName(DOMstrings.search)[0];
+            function callData() {
+                if (type !== undefined) {
+                    clearTimeout(type);
+                }
+                type = setTimeout(function () {
+                    var prefix = searchEl.value;
+                    console.log(prefix);
+                    data.loadAjax(prefix, printItems);
+                }, 1000);
+            }
+            searchEl.addEventListener('input', callData);
+            /* searchEl.addEventListener('input', function(){
+                console.log("promenjena vrednost input polja");
+            }); */
+        }
+    };
+    return {
+        printItems: printItems,
+        events: Events
+    };
+
+    console.log(data);
+}(_dataModule2.default);
+
+//PROBA
+console.log(_dataModule2.default.urlData);
+_dataModule2.default.loadAjax("me", UIController.printItems);
+console.log(_dataModule2.default.urlData);
+console.log(_dataModule2.default.getSavedItems);
+//dataController.makeSavedCharacter(1011241, "Menace", "slika");
+//dataController.makeSavedCharacter(1011099, "Menace", {path:"slika",extension:"jpg"});
+_dataModule2.default.loadSaved();
+UIController.events.changeBookmarkStatus();
+UIController.events.typeSearchCharacter();
+
+(function () {
+    setTimeout(function () {
+        console.log(_dataModule2.default.getSavedItems);
+        //dataController.removeSavedCharacter(1011241);
+    }, 2000);
+})();
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -110,37 +231,99 @@ var dataController = function () {
         return urlAddress;
     };
 
-    var Character = function () {
-        function Character(id, name, thumbnail, savedItems) {
-            _classCallCheck(this, Character);
+    var Character = function Character(id, name, thumbnail) {
+        _classCallCheck(this, Character);
 
-            this.id = id;
-            this.name = name;
-            this.thumbnail = thumbnail;
-            this.isBook = false;
-        }
+        this.id = id;
+        this.name = name;
+        this.thumbnail = thumbnail;
+        //this.isBookmarked=false;
+    };
+    //check if elements of loaded items is bookmarked
 
-        _createClass(Character, [{
-            key: "checkBook",
-            value: function checkBook() {
-                var _this = this;
 
-                if (savedItems.length > 0) {
-                    saveditems.forEach(function (current, index) {
-                        if (current.id === _this.id) {
-                            _this.isBook = true;
-                        }
-                    });
+    var checkIsBookmarked = function checkIsBookmarked(itemsArray) {
+        if (savedItems.length > 0) {
+            for (var i = 0; i < savedItems.length; i++) {
+                for (var j = 0; j < itemsArray.length; j++) {
+                    if (savedItems[i].id === itemsArray[j].id) {
+                        itemsArray[j].isBookmarked = true;
+                        break;
+                    }
                 }
             }
-        }]);
+        }
+    };
+    //make Character objects from loaded data and add them to loadedItems array
+    var makeCharacter = function makeCharacter(itemsArray) {
+        itemsArray.forEach(function (current) {
+            var id = current.id,
+                name = current.name,
+                thumbnail = current.thumbnail;
 
-        return Character;
-    }();
+            loadedItems.push(new Character(id, name, thumbnail));
+        });
+    };
+    //load saved Characters
+    var loadSavedCharacter = function loadSavedCharacter() {
+        if (typeof Storage !== "undefined" && localStorage.marvel) {
+            console.log(localStorage.getItem('marvel'));
+            var tekst = JSON.parse(localStorage.getItem('marvel'));
+            tekst.forEach(function (current) {
+                var id = current.id,
+                    name = current.name,
+                    thumbnail = current.thumbnail;
+
+                savedItems.push(new Character(id, name, thumbnail));
+            });
+            //savedItems.push(new Character(id, name, thumbnail));
+            console.log("Snimljeni objekti:");
+            console.log(Array.isArray(savedItems));
+            console.log(savedItems);
+        } else {
+            console.log("there aren't saved characters");
+        }
+    };
+    //make bookmarked Character object
+    var makeSavedCharacter = function makeSavedCharacter(id, name, thumbnail) {
+        //id=id.toString();
+        savedItems.push(new Character(id, name, thumbnail));
+        if (typeof Storage !== "undefined") {
+            localStorage.setItem("marvel", JSON.stringify(savedItems));
+        } else {
+            message = "No web storage support!";
+        }
+    };
+    //remove bookmarked Character object
+    var removeSavedCharacter = function removeSavedCharacter(itemId) {
+        parseInt(itemId);
+        console.log("unutar funkcije:");
+        console.log(savedItems.length);
+        var indexPos = -1;
+        if (savedItems.length !== 0) {
+            console.log("ima clanova");
+            indexPos = savedItems.findIndex(function (current) {
+                console.log(current.id);
+                console.log(itemId);
+                return current.id === itemId;
+            });
+            console.log("indexPos " + indexPos);
+            if (indexPos !== -1) {
+                savedItems.splice(indexPos, 1);
+                localStorage.setItem("marvel", JSON.stringify(savedItems));
+                console.log("obrisan clan niza");
+                if (savedItems.length === 0) {
+                    localStorage.removeItem("marvel");
+                }
+            }
+        } else {
+            console.log("nema clanova");
+        }
+    };
+
     //make Ajax call
-
-
-    function loadAjax(prefix) {
+    var loadAjax = function loadAjax(prefix, callback) {
+        loadedItems = [];
         if (xhr) {
             xhr.abort();
             xhr = null;
@@ -165,6 +348,11 @@ var dataController = function () {
                     resultsData.total = total;
                     console.log(resultsData);
                     console.log(results);
+                    makeCharacter(results);
+                    console.log(loadedItems);
+                    checkIsBookmarked(loadedItems);
+                    console.log(loadedItems);
+                    callback(loadedItems);
                 } else if (xhr.status >= 400) {
                     console.log('There was an error.');
                 }
@@ -172,18 +360,21 @@ var dataController = function () {
         };
         xhr.open('GET', urlAddress, true);
         xhr.send();
-    }
+    };
 
     return {
         urlData: urlData,
-        loadAjax: loadAjax
+        loadAjax: loadAjax,
+        loadSaved: loadSavedCharacter,
+        makeSavedCharacter: makeSavedCharacter,
+        removeSavedCharacter: removeSavedCharacter,
+        getLoadedItems: loadedItems,
+        getSavedItems: savedItems
     };
 }();
 
-//PROBA
-console.log(dataController.urlData);
-dataController.loadAjax("me");
-console.log(dataController.urlData);
+exports.default = dataController;
+
 
 {
     var myFunction = function myFunction() {
