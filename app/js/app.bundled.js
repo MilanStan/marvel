@@ -87,19 +87,26 @@ var UIController = function (data) {
         bookmark: "bookmark"
     };
     //method for printing character items
-    var printItems = function printItems(charactersArray) {
+    var printItems = function printItems(charactersArray, typeTitle) {
         var output = '';
         charactersArray.forEach(function (element) {
             output += printItem(element);
         });
         console.log("Izvršeno print items");
-        console.log(output);
+        //console.log(output);
         document.getElementsByClassName(DOMstrings.mainWrapper)[0].innerHTML = output;
         //return output;
+
+        //turn off loader - show container
+        if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+            document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
+        }
+        //change title
+        changeTitle(charactersArray.length, typeTitle);
     };
     //method for printing one item
     var printItem = function printItem(characterItem) {
-        var output = "<div class=\"item-wrapper\">\n            <div class=\"image-wrapper\" style='" + getImage(characterItem.thumbnail) + "'></div>\n            <div class=\"name\">" + characterItem.name + "</div>\n            <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n                " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true">') + "\n                </span>\n            </div>\n        </div>";
+        var output = "<div class=\"item-wrapper\">\n            <div class=\"image-wrapper\" style='" + getImage(characterItem.thumbnail) + "'></div>\n            <div class=\"name\">" + characterItem.name + "</div>\n            <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n                " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">') + "\n                </span>\n            </div>\n        </div>";
         return output;
     };
     //method for getting background image
@@ -108,31 +115,58 @@ var UIController = function (data) {
         output = "\n        background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        @media (min-width:481px){\n            background-image:url(\"" + thumbnail.path + "/landscape_amazing." + thumbnail.extension + "\");\n        }\n        @media (min-width:992px){\n            background-image:url(\"" + thumbnail.path + "/landscape_incredible." + thumbnail.extension + "\");\n        }\n        @media (min-width:1201px){\n            background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        }\n        ";
         return output;
     };
+    //change title
+    var changeTitle = function changeTitle(arrayLenght, title) {
+        console.log("Naslov" + arrayLenght, title);
+        var titleContainer = document.getElementsByClassName(DOMstrings.title)[0];
+        var newTitle = "";
+        if (title == "saved" && arrayLenght > 0) {
+            newTitle = "Your bookmarks";
+        }
+        if (title == "saved" && arrayLenght == 0) {
+            newTitle = "There aren't your bookmarks";
+        }
+        if (title == "loaded") {
+            var prefix = document.getElementsByClassName(DOMstrings.search)[0].value;
+            if (arrayLenght == 0) {
+                newTitle = "No items start with '" + prefix + "'";
+            } else {
+                newTitle = "Items which start with '" + prefix + "'";
+            }
+        }
+        titleContainer.innerHTML = newTitle;
+    };
 
     var Events = {
+        loadDocument: function loadDocument() {
+            window.addEventListener('load', function () {
+                data.loadSavedCharacter(printItems);
+            });
+            document.getElementsByClassName(DOMstrings.search)[0].focus();
+        },
         changeBookmarkStatus: function changeBookmarkStatus() {
             document.addEventListener('click', function (e) {
                 if (e.target && e.target.parentNode.classList.contains(DOMstrings.bookmark)) {
-                    console.log("Kliknuta je zvezda");
+                    //console.log("Kliknuta je zvezda");
                     var currentStar = e.target.parentNode;
                     var id = parseInt(currentStar.getAttribute('data-id'));
-                    console.log(id);
+                    //console.log(id);
                     var isBookmarked = currentStar.getAttribute('data-isbook') === "true" ? true : false;
-                    console.log(isBookmarked);
+                    //console.log(isBookmarked);
                     if (!isBookmarked) {
                         var name = currentStar.getAttribute('data-name');
                         var thumbnail = {
                             path: currentStar.getAttribute('data-path'),
                             extension: currentStar.getAttribute('data-extension')
                         };
-                        console.log(name, thumbnail);
-                        data.makeSavedCharacter(id, name, thumbnail);
+                        //console.log(name, thumbnail);
+                        data.makeSavedCharacter(id, name, thumbnail, true);
                         currentStar.setAttribute('data-isbook', 'true');
-                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star" aria-hidden="true">';
+                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">';
                     } else {
                         data.removeSavedCharacter(id);
                         currentStar.setAttribute('data-isbook', 'false');
-                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star-empty" aria-hidden="true">';
+                        currentStar.innerHTML = '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">';
                     }
                 }
             });
@@ -140,6 +174,7 @@ var UIController = function (data) {
         typeSearchCharacter: function typeSearchCharacter() {
             var type;
             var searchEl = document.getElementsByClassName(DOMstrings.search)[0];
+            //set timeout for typing and call loadAjax
             function callData() {
                 if (type !== undefined) {
                     clearTimeout(type);
@@ -147,40 +182,49 @@ var UIController = function (data) {
                 type = setTimeout(function () {
                     var prefix = searchEl.value;
                     console.log(prefix);
-                    data.loadAjax(prefix, printItems);
+                    if (prefix) {
+                        data.loadAjax(prefix, printItems);
+                    } else {
+                        printItems(data.getSavedItems, "saved");
+                    }
                 }, 1000);
             }
+            //turn on loader
+            function turnOnLoader() {
+                if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+                    document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
+                }
+            }
             searchEl.addEventListener('input', callData);
-            /* searchEl.addEventListener('input', function(){
-                console.log("promenjena vrednost input polja");
-            }); */
+            searchEl.addEventListener('input', turnOnLoader);
         }
     };
     return {
-        printItems: printItems,
-        events: Events
+        Init: function Init() {
+            Events.changeBookmarkStatus();
+            Events.typeSearchCharacter();
+            Events.loadDocument();
+        }
+        /* printItems: printItems,
+        events: Events */
     };
 
     console.log(data);
 }(_dataModule2.default);
 
 //PROBA
-console.log(_dataModule2.default.urlData);
-_dataModule2.default.loadAjax("me", UIController.printItems);
-console.log(_dataModule2.default.urlData);
-console.log(_dataModule2.default.getSavedItems);
+//console.log(dataController.urlData);
+//dataController.loadAjax("me", UIController.printItems);
+//console.log(dataController.urlData);
+//console.log(dataController.getSavedItems);
 //dataController.makeSavedCharacter(1011241, "Menace", "slika");
 //dataController.makeSavedCharacter(1011099, "Menace", {path:"slika",extension:"jpg"});
-_dataModule2.default.loadSaved();
-UIController.events.changeBookmarkStatus();
+//dataController.loadSaved();
+/* UIController.events.changeBookmarkStatus();
 UIController.events.typeSearchCharacter();
-
-(function () {
-    setTimeout(function () {
-        console.log(_dataModule2.default.getSavedItems);
-        //dataController.removeSavedCharacter(1011241);
-    }, 2000);
-})();
+console.log("stampaju se objekti");
+UIController.events.loadDocument(); */
+UIController.Init();
 
 /***/ }),
 /* 1 */
@@ -208,36 +252,42 @@ var dataController = function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: "limit=20&",
-        offset: "offset=0&",
+        limit: 12, //"limit=20&",
+        offset: 0, //"offset=0&",
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
+    //url data if have pagination
+    var newUrlData = null;
     //data about results
     var resultsData = {
         count: 0,
-        limit: 0,
+        limit: 20,
         offset: 0,
-        total: 0
+        total: 0,
+        page: 1
+
         //make url
     };var makeUrl = function makeUrl(prefix) {
         urlData.prefix = prefix + "&";
         var urlAddress = '';
-        for (var m in urlData) {
+        /* for (let m in urlData) {
             if (urlData.hasOwnProperty(m)) {
                 urlAddress += urlData[m];
             }
-        }
+        } */
+        //console.log(urlAddress);
+        urlAddress = "" + urlData.baseUrl + urlData.subject + urlData.nameStartText + urlData.prefix + "limit=" + urlData.limit + "&offset=" + urlData.offset + "&" + urlData.apikey;
         console.log(urlAddress);
         return urlAddress;
     };
 
-    var Character = function Character(id, name, thumbnail) {
+    var Character = function Character(id, name, thumbnail, isBookmarked) {
         _classCallCheck(this, Character);
 
         this.id = id;
         this.name = name;
         this.thumbnail = thumbnail;
-        //this.isBookmarked=false;
+        this.isBookmarked = isBookmarked;
     };
     //check if elements of loaded items is bookmarked
 
@@ -265,29 +315,31 @@ var dataController = function () {
         });
     };
     //load saved Characters
-    var loadSavedCharacter = function loadSavedCharacter() {
+    var loadSavedCharacter = function loadSavedCharacter(callback) {
         if (typeof Storage !== "undefined" && localStorage.marvel) {
             console.log(localStorage.getItem('marvel'));
             var tekst = JSON.parse(localStorage.getItem('marvel'));
             tekst.forEach(function (current) {
                 var id = current.id,
                     name = current.name,
-                    thumbnail = current.thumbnail;
+                    thumbnail = current.thumbnail,
+                    isBookmarked = current.isBookmarked;
 
-                savedItems.push(new Character(id, name, thumbnail));
+                savedItems.push(new Character(id, name, thumbnail, isBookmarked));
             });
             //savedItems.push(new Character(id, name, thumbnail));
             console.log("Snimljeni objekti:");
-            console.log(Array.isArray(savedItems));
+            //console.log(Array.isArray(savedItems));
             console.log(savedItems);
         } else {
             console.log("there aren't saved characters");
         }
+        callback(savedItems, "saved");
     };
     //make bookmarked Character object
-    var makeSavedCharacter = function makeSavedCharacter(id, name, thumbnail) {
+    var makeSavedCharacter = function makeSavedCharacter(id, name, thumbnail, isBook) {
         //id=id.toString();
-        savedItems.push(new Character(id, name, thumbnail));
+        savedItems.push(new Character(id, name, thumbnail, isBook));
         if (typeof Storage !== "undefined") {
             localStorage.setItem("marvel", JSON.stringify(savedItems));
         } else {
@@ -352,7 +404,8 @@ var dataController = function () {
                     console.log(loadedItems);
                     checkIsBookmarked(loadedItems);
                     console.log(loadedItems);
-                    callback(loadedItems);
+                    //changePage();
+                    callback(loadedItems, "loaded");
                 } else if (xhr.status >= 400) {
                     console.log('There was an error.');
                 }
@@ -365,7 +418,7 @@ var dataController = function () {
     return {
         urlData: urlData,
         loadAjax: loadAjax,
-        loadSaved: loadSavedCharacter,
+        loadSavedCharacter: loadSavedCharacter,
         makeSavedCharacter: makeSavedCharacter,
         removeSavedCharacter: removeSavedCharacter,
         getLoadedItems: loadedItems,
@@ -374,25 +427,6 @@ var dataController = function () {
 }();
 
 exports.default = dataController;
-
-
-{
-    var myFunction = function myFunction() {
-        if (myVar !== undefined) {
-            clearTimeout(myVar);
-        }
-        myVar = setTimeout(function () {
-            alert("Hello");
-            console.log("pozdrav");
-        }, 1000);
-    };
-
-    //window.addEventListener('keypress', myFunction);
-
-
-    //Set timeout function
-    var myVar;
-}
 
 /***/ })
 /******/ ]);

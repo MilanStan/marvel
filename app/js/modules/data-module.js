@@ -11,35 +11,41 @@ var dataController = (function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: "limit=20&",
-        offset: "offset=0&",
+        limit: 12,//"limit=20&",
+        offset: 0,//"offset=0&",
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
+    //url data if have pagination
+    var newUrlData=null;
     //data about results
     var resultsData = {
         count: 0,
-        limit: 0,
+        limit: 20,
         offset: 0,
-        total: 0
+        total: 0,
+        page:1
     }
+    
     //make url
     var makeUrl = function (prefix) {
         urlData.prefix = `${prefix}&`;
         let urlAddress = '';
-        for (let m in urlData) {
+        /* for (let m in urlData) {
             if (urlData.hasOwnProperty(m)) {
                 urlAddress += urlData[m];
             }
-        }
+        } */
+        //console.log(urlAddress);
+        urlAddress=`${urlData.baseUrl}${urlData.subject}${urlData.nameStartText}${urlData.prefix}limit=${urlData.limit}&offset=${urlData.offset}&${urlData.apikey}`;
         console.log(urlAddress);
         return urlAddress;
     };
     class Character {
-        constructor(id, name, thumbnail) {
+        constructor(id, name, thumbnail,isBookmarked) {
             this.id = id;
             this.name = name;
             this.thumbnail = thumbnail;
-            //this.isBookmarked=false;
+            this.isBookmarked = isBookmarked;
         }
     }
     //check if elements of loaded items is bookmarked
@@ -67,7 +73,7 @@ var dataController = (function () {
         });
     };
     //load saved Characters
-    var loadSavedCharacter = function () {
+    var loadSavedCharacter = function (callback) {
         if (typeof (Storage) !== "undefined" && localStorage.marvel) {
             console.log(localStorage.getItem('marvel'));
             var tekst = JSON.parse(localStorage.getItem('marvel'));
@@ -75,22 +81,24 @@ var dataController = (function () {
                 let {
                     id,
                     name,
-                    thumbnail
+                    thumbnail,
+                    isBookmarked
                 } = current;
-                savedItems.push(new Character(id, name, thumbnail));
+                savedItems.push(new Character(id, name, thumbnail,isBookmarked));
             });
             //savedItems.push(new Character(id, name, thumbnail));
             console.log("Snimljeni objekti:");
-            console.log(Array.isArray(savedItems));
+            //console.log(Array.isArray(savedItems));
             console.log(savedItems);
         } else {
             console.log("there aren't saved characters");
         }
+        callback(savedItems,"saved");
     };
     //make bookmarked Character object
-    var makeSavedCharacter = function (id, name, thumbnail) {
+    var makeSavedCharacter = function (id, name, thumbnail, isBook) {
         //id=id.toString();
-        savedItems.push(new Character(id, name, thumbnail));
+        savedItems.push(new Character(id, name, thumbnail, isBook));
         if (typeof (Storage) !== "undefined") {
             localStorage.setItem("marvel", JSON.stringify(savedItems));
         } else {
@@ -155,7 +163,8 @@ var dataController = (function () {
                     console.log(loadedItems);
                     checkIsBookmarked(loadedItems);
                     console.log(loadedItems);
-                    callback(loadedItems);
+                    //changePage();
+                    callback(loadedItems,"loaded");
                 } else if (xhr.status >= 400) {
                     console.log('There was an error.');
                 }
@@ -168,7 +177,7 @@ var dataController = (function () {
     return {
         urlData: urlData,
         loadAjax: loadAjax,
-        loadSaved: loadSavedCharacter,
+        loadSavedCharacter: loadSavedCharacter,
         makeSavedCharacter: makeSavedCharacter,
         removeSavedCharacter: removeSavedCharacter,
         getLoadedItems: loadedItems,
@@ -181,21 +190,3 @@ var dataController = (function () {
 export default dataController;
 
 
-
-{
-    //Set timeout function
-    var myVar;
-
-    function myFunction() {
-        if (myVar !== undefined) {
-            clearTimeout(myVar);
-        }
-        myVar = setTimeout(
-            function () {
-                alert("Hello");
-                console.log("pozdrav");
-            }, 1000);
-    }
-
-    //window.addEventListener('keypress', myFunction);
-}

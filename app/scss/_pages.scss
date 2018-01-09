@@ -1,34 +1,75 @@
 .main-container{
     min-height:100vh;
+    background-image:url('../img/dual-ring-big.gif');
+    background-size:200px 200px;
+    background-color: $bg-color;
+    @extend %background;
     header{
         height:10vh;
-        border:1px solid blue;
         text-align: center;
         //padding-top:20px;
+        background-color:$letter-bg;
+        color:white;
+        text-transform:uppercase;
+        position:relative;
         .title-container{
-            display:inline;
+            font-weight:bold;
             line-height:10vh;
+            @extend %absolute;
+            text-align:left;
+            padding-left:20px;
         }
-        .search-input{
-            width:30%;
+        .input-container{
+            @extend %absolute;
+            text-align:right;
+            left:50%;
+            .search-input{
+                position:absolute;
+                top:50%;
+                right:2%;
+                margin-top:-23px;
+                width:70%;
+                background-color:white;
+                color: $letter-bg;
+                font-weight:bold;
+                text-transform: uppercase;
+                border:none;
+                padding-top:12px;
+                font-size:26px;
+            }
         }
+       
     }
     .main-wrapper{
         height:90vh;
-        border:1px solid red;
         display:flex;
         flex-wrap:wrap;
         align-content:start;
+        background-color:$letter-bg;
+        opacity:0;
+        transition: 0.4s;
+        &.shown{
+            opacity: 1;
+        }
         .item-wrapper{
             width:100%;
-            height:10%;
+            height:8.33%;
             position:relative;
+            background-image:url('../img/dual-ring-small.gif');
+            background-size:50px 50px;
+            @extend %background;
             @media (min-width:481px){
                 width:50%;
+                height:16.66%;
             }
-            @media (min-width:991px){
+            @media (min-width:768px){
+                width:33.33%;
+                height:25%
+            }
+            @media (min-width:992px){
                 width:25%;
-                height:20%;
+                //height:20%;
+                height:33.33%;
             }
 
             .image-wrapper{
@@ -41,10 +82,10 @@
                 position:absolute;
                 bottom:0;
                 left:0;
-                background-color:red;
+                background-color:$letter-bg;
                 color:white;
                 padding:5px;
-                font-size:24px;
+                font-size:30px;
                 font-weight:bold;
                 text-transform: uppercase;
             }
@@ -64,5 +105,82 @@
                 }
             }
         }
+    }
+}
+@media (max-width:1450px){
+    
+    .main-container header .title-container{
+        width:60%;
+        font-size:28px;
+    }
+    .main-container header .input-container{
+        left:60%;
+        width:40%;
+        .search-input{
+            font-size:21px;
+            width:95%;
+        }
+    }
+    .main-container .main-wrapper .item-wrapper .name{
+        font-size:24px;
+    }
+}
+@media (max-width:991px){
+    .main-container header .title-container{
+        font-size:26px;
+    }
+    .main-container .main-wrapper .item-wrapper .name{
+        font-size:18px;
+    }
+    .main-container header .input-container .search-input{
+        font-size:21px;
+    }
+}
+@media (max-width:771px){
+    .main-container header{
+        height:12vh;
+    }
+    .main-container .main-wrapper{
+        height:88vh;
+    }
+    .main-container header .title-container{
+        width:100%;
+        position:relative;
+        height:6vh;
+        line-height:6vh;
+        font-size:22px;
+        text-align:center;
+        padding-left:0;
+    }
+    .main-container header .input-container{
+        position:relative;
+        top:0;
+        left:0;
+        width:100%;
+        height:initial;
+        .search-input{
+            text-align:center;
+            margin:0 2.5%;
+            width:95%;
+            right:0;
+            position:relative;
+            top:0;
+            font-size:18px;
+            height:36px;
+        }
+    }
+    .main-container .main-wrapper .item-wrapper .name{
+        font-size:18px;
+    }
+    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
+        font-size:38px;
+    }
+}
+@media (max-width:559px){
+    .main-container .main-wrapper .item-wrapper .name{
+        font-size:15px;
+    } 
+    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
+        font-size:3px;
     }
 }
