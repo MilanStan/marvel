@@ -63,6 +63,9 @@ var UIController = (function (data) {
         if(title=="saved" && arrayLenght==0){
             newTitle="There aren't your bookmarks";
         }
+        if(title=="error" && arrayLenght==0){
+            newTitle="Database error occurred!";
+        }
         if(title=="loaded"){
             let prefix=document.getElementsByClassName(DOMstrings.search)[0].value;
             if(arrayLenght==0){

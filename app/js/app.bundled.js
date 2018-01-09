@@ -145,6 +145,9 @@ var UIController = function (data) {
         if (title == "saved" && arrayLenght == 0) {
             newTitle = "There aren't your bookmarks";
         }
+        if (title == "error" && arrayLenght == 0) {
+            newTitle = "Database error occurred!";
+        }
         if (title == "loaded") {
             var prefix = document.getElementsByClassName(DOMstrings.search)[0].value;
             if (arrayLenght == 0) {
@@ -393,15 +396,12 @@ var dataController = function () {
                     resultsData.limit = limit;
                     resultsData.offset = offset;
                     resultsData.total = total;
-                    console.log(resultsData);
-                    console.log(results);
                     makeCharacter(results);
-                    console.log(loadedItems);
                     checkIsBookmarked(loadedItems);
-                    console.log(loadedItems);
                     //changePage();
                     callback(loadedItems, "loaded");
                 } else if (xhr.status >= 400) {
+                    callback(loadedItems, "error");
                     console.log('There was an error.');
                 }
             }

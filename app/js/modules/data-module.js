@@ -149,15 +149,12 @@ var dataController = (function () {
                     resultsData.limit = limit;
                     resultsData.offset = offset;
                     resultsData.total = total;
-                    console.log(resultsData);
-                    console.log(results);
                     makeCharacter(results);
-                    console.log(loadedItems);
                     checkIsBookmarked(loadedItems);
-                    console.log(loadedItems);
                     //changePage();
                     callback(loadedItems,"loaded");
                 } else if (xhr.status >= 400) {
+                    callback(loadedItems,"error")
                     console.log('There was an error.');
                 }
             }
