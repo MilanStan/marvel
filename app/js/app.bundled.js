@@ -103,10 +103,12 @@ var UIController = function (data) {
         mainContainer: "main-container",
         mainWrapper: "main-wrapper",
         itemWrapper: "item-wrapper",
-        bookmark: "bookmark"
+        bookmark: "bookmark",
+        prev: "prev",
+        next: "next"
     };
     //method for printing character items
-    var printItems = function printItems(charactersArray, typeTitle) {
+    var printItems = function printItems(charactersArray, typeTitle, prev, next) {
         var output = '';
         charactersArray.forEach(function (element) {
             output += printItem(element);
@@ -122,6 +124,23 @@ var UIController = function (data) {
         }
         //change title
         changeTitle(charactersArray.length, typeTitle);
+        //switch pagination
+        if (prev) {
+            document.getElementsByClassName(DOMstrings.prev)[0].classList.add("active");
+        } else {
+            if (document.getElementsByClassName(DOMstrings.prev)[0].classList.contains("active")) {
+                document.getElementsByClassName(DOMstrings.prev)[0].classList.remove("active");
+            }
+        }
+        if (next) {
+            document.getElementsByClassName(DOMstrings.next)[0].classList.add("active");
+        } else {
+            if (document.getElementsByClassName(DOMstrings.next)[0].classList.contains("active")) {
+                document.getElementsByClassName(DOMstrings.next)[0].classList.remove("active");
+            }
+        }
+        console.log(prev);
+        console.log(next);
     };
     //method for printing one item
     var printItem = function printItem(characterItem) {
@@ -143,7 +162,7 @@ var UIController = function (data) {
             newTitle = "Your bookmarks";
         }
         if (title == "saved" && arrayLenght == 0) {
-            newTitle = "There aren't your bookmarks";
+            newTitle = "No bookmarks!";
         }
         if (title == "error" && arrayLenght == 0) {
             newTitle = "Database error occurred!";
@@ -153,10 +172,16 @@ var UIController = function (data) {
             if (arrayLenght == 0) {
                 newTitle = "No items start with '" + prefix + "'";
             } else {
-                newTitle = "Items which start with '" + prefix + "'";
+                newTitle = "Items start with '" + prefix + "'";
             }
         }
         titleContainer.innerHTML = newTitle;
+    };
+    //turn on loader
+    var turnOnLoader = function turnOnLoader() {
+        if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+            document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
+        }
     };
 
     var Events = {
@@ -201,20 +226,27 @@ var UIController = function (data) {
                     var prefix = searchEl.value;
                     console.log(prefix);
                     if (prefix) {
+                        data.resetUrlData();
                         data.loadAjax(prefix, printItems);
                     } else {
-                        printItems(data.getSavedItems, "saved");
+                        printItems(data.getSavedItems, "saved", 0, 0);
                     }
                 }, 1000);
             }
-            //turn on loader
-            function turnOnLoader() {
-                if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
-                    document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
-                }
-            }
             searchEl.addEventListener('input', callData);
             searchEl.addEventListener('input', turnOnLoader);
+        },
+        changePage: function changePage() {
+            document.addEventListener('click', function (ev) {
+                if (ev.target && ev.target.parentNode && ev.target.parentNode.classList.contains('pagination')) {
+                    console.log("Paginacija");
+                    var direction = '';
+                    direction = ev.target.parentNode.getAttribute('data-direction');
+                    console.log(direction);
+                    turnOnLoader();
+                    data.changePage(direction, printItems);
+                }
+            });
         }
     };
     return {
@@ -222,6 +254,7 @@ var UIController = function (data) {
             Events.changeBookmarkStatus();
             Events.typeSearchCharacter();
             Events.loadDocument();
+            Events.changePage();
         }
         /* printItems: printItems,
         events: Events */
@@ -262,22 +295,48 @@ var dataController = function () {
         offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
-    //url data if have pagination
-    var newUrlData = null;
     //data about results
     var resultsData = {
         count: 0,
         limit: 20,
         offset: 0,
         total: 0,
-        page: 1
-
-        //make url
-    };var makeUrl = function makeUrl(prefix) {
-        urlData.prefix = prefix + "&";
+        showNext: 0,
+        showPrev: 0
+        //url data if have pagination
+    };var newUrlData = null;
+    //toggle pagination arrows
+    var loadPagination = function loadPagination() {
+        if (resultsData.total > urlData.offset + urlData.limit) {
+            if (newUrlData === null) {
+                newUrlData = Object.assign({}, urlData);
+            }
+            resultsData.showNext = 1;
+        } else {
+            resultsData.showNext = 0;
+        }
+        if (urlData.offset > 0) {
+            resultsData.showPrev = 1;
+        } else {
+            resultsData.showPrev = 0;
+        }
+    };
+    //changePage function
+    var changePage = function changePage(direction, printCall) {
+        if (direction === "next") {
+            urlData.offset += urlData.limit;
+        } else if (direction === "prev") {
+            urlData.offset -= urlData.limit;
+        }
+        //console.log(urlData.offset);
+        loadAjax(urlData.prefix, printCall);
+    };
+    //make url
+    var makeUrl = function makeUrl(prefix) {
+        urlData.prefix = "" + prefix;
         var urlAddress = '';
 
-        urlAddress = "" + urlData.baseUrl + urlData.subject + urlData.nameStartText + urlData.prefix + "limit=" + urlData.limit + "&offset=" + urlData.offset + "&" + urlData.apikey;
+        urlAddress = "" + urlData.baseUrl + urlData.subject + urlData.nameStartText + urlData.prefix + "&limit=" + urlData.limit + "&offset=" + urlData.offset + "&" + urlData.apikey;
         console.log(urlAddress);
         return urlAddress;
     };
@@ -318,7 +377,7 @@ var dataController = function () {
     //load saved Characters
     var loadSavedCharacter = function loadSavedCharacter(callback) {
         if (typeof Storage !== "undefined" && localStorage.marvel) {
-            console.log(localStorage.getItem('marvel'));
+            //console.log(localStorage.getItem('marvel'));
             var tekst = JSON.parse(localStorage.getItem('marvel'));
             tekst.forEach(function (current) {
                 var id = current.id,
@@ -328,12 +387,10 @@ var dataController = function () {
 
                 savedItems.push(new Character(id, name, thumbnail, isBookmarked));
             });
-            console.log("Snimljeni objekti:");
-            console.log(savedItems);
         } else {
             console.log("there aren't saved characters");
         }
-        callback(savedItems, "saved");
+        callback(savedItems, "saved", 0, 0);
     };
     //make bookmarked Character object
     var makeSavedCharacter = function makeSavedCharacter(id, name, thumbnail, isBook) {
@@ -347,27 +404,22 @@ var dataController = function () {
     //remove bookmarked Character object
     var removeSavedCharacter = function removeSavedCharacter(itemId) {
         parseInt(itemId);
-        console.log("unutar funkcije:");
-        console.log(savedItems.length);
         var indexPos = -1;
         if (savedItems.length !== 0) {
-            console.log("ima clanova");
             indexPos = savedItems.findIndex(function (current) {
-                console.log(current.id);
-                console.log(itemId);
                 return current.id === itemId;
             });
-            console.log("indexPos " + indexPos);
+            //console.log("indexPos " + indexPos);
             if (indexPos !== -1) {
                 savedItems.splice(indexPos, 1);
                 localStorage.setItem("marvel", JSON.stringify(savedItems));
-                console.log("obrisan clan niza");
+                //console.log("obrisan clan niza");
                 if (savedItems.length === 0) {
                     localStorage.removeItem("marvel");
                 }
             }
         } else {
-            console.log("nema clanova");
+            //console.log("nema clanova");
         }
     };
 
@@ -384,22 +436,16 @@ var dataController = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status == 200) {
                     var dataObj = JSON.parse(xhr.responseText);
-                    console.log(dataObj);
+                    //console.log(dataObj);
                     var _dataObj$data = dataObj.data,
-                        count = _dataObj$data.count,
-                        limit = _dataObj$data.limit,
-                        offset = _dataObj$data.offset,
                         results = _dataObj$data.results,
                         total = _dataObj$data.total;
 
-                    resultsData.count = count;
-                    resultsData.limit = limit;
-                    resultsData.offset = offset;
                     resultsData.total = total;
                     makeCharacter(results);
                     checkIsBookmarked(loadedItems);
-                    //changePage();
-                    callback(loadedItems, "loaded");
+                    loadPagination();
+                    callback(loadedItems, "loaded", resultsData.showPrev, resultsData.showNext);
                 } else if (xhr.status >= 400) {
                     callback(loadedItems, "error");
                     console.log('There was an error.');
@@ -409,6 +455,14 @@ var dataController = function () {
         xhr.open('GET', urlAddress, true);
         xhr.send();
     };
+    //reset url data
+    var resetUrlData = function resetUrlData() {
+        if (newUrlData !== null) {
+            urlData = Object.assign({}, newUrlData);
+            newUrlData = null;
+            //console.log("resetovan url");
+        }
+    };
 
     return {
         urlData: urlData,
@@ -417,7 +471,9 @@ var dataController = function () {
         makeSavedCharacter: makeSavedCharacter,
         removeSavedCharacter: removeSavedCharacter,
         getLoadedItems: loadedItems,
-        getSavedItems: savedItems
+        getSavedItems: savedItems,
+        changePage: changePage,
+        resetUrlData: resetUrlData
     };
 }();
 

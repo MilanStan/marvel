@@ -8,10 +8,12 @@ var UIController = (function (data) {
         mainContainer: "main-container",
         mainWrapper: "main-wrapper",
         itemWrapper: "item-wrapper",
-        bookmark: "bookmark"
+        bookmark: "bookmark",
+        prev: "prev",
+        next: "next"
     };
     //method for printing character items
-    var printItems = (charactersArray, typeTitle) => {
+    var printItems = (charactersArray, typeTitle, prev, next) => {
         let output = '';
         charactersArray.forEach(element => {
             output += printItem(element);
@@ -22,11 +24,28 @@ var UIController = (function (data) {
         //return output;
 
         //turn off loader - show container
-        if(!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")){
+        if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
         }
         //change title
         changeTitle(charactersArray.length, typeTitle);
+        //switch pagination
+        if (prev) {
+            document.getElementsByClassName(DOMstrings.prev)[0].classList.add("active");
+        } else {
+            if (document.getElementsByClassName(DOMstrings.prev)[0].classList.contains("active")) {
+                document.getElementsByClassName(DOMstrings.prev)[0].classList.remove("active");
+            }
+        }
+        if (next) {
+            document.getElementsByClassName(DOMstrings.next)[0].classList.add("active");
+        } else {
+            if (document.getElementsByClassName(DOMstrings.next)[0].classList.contains("active")) {
+                document.getElementsByClassName(DOMstrings.next)[0].classList.remove("active");
+            }
+        }
+        console.log(prev);
+        console.log(next);
     };
     //method for printing one item
     var printItem = characterItem => {
@@ -53,34 +72,39 @@ var UIController = (function (data) {
         return output;
     };
     //change title
-    var changeTitle=(arrayLenght, title)=>{
-        console.log("Naslov" +arrayLenght, title);
-        let titleContainer=document.getElementsByClassName(DOMstrings.title)[0];
-        let newTitle="";
-        if(title=="saved" && arrayLenght>0){
-            newTitle="Your bookmarks";
+    var changeTitle = (arrayLenght, title) => {
+        console.log("Naslov" + arrayLenght, title);
+        let titleContainer = document.getElementsByClassName(DOMstrings.title)[0];
+        let newTitle = "";
+        if (title == "saved" && arrayLenght > 0) {
+            newTitle = "Your bookmarks";
         }
-        if(title=="saved" && arrayLenght==0){
-            newTitle="There aren't your bookmarks";
+        if (title == "saved" && arrayLenght == 0) {
+            newTitle = "No bookmarks!";
         }
-        if(title=="error" && arrayLenght==0){
-            newTitle="Database error occurred!";
+        if (title == "error" && arrayLenght == 0) {
+            newTitle = "Database error occurred!";
         }
-        if(title=="loaded"){
-            let prefix=document.getElementsByClassName(DOMstrings.search)[0].value;
-            if(arrayLenght==0){
-                newTitle=`No items start with '${prefix}'`;
+        if (title == "loaded") {
+            let prefix = document.getElementsByClassName(DOMstrings.search)[0].value;
+            if (arrayLenght == 0) {
+                newTitle = `No items start with '${prefix}'`;
+            } else {
+                newTitle = `Items start with '${prefix}'`;
             }
-            else{
-                newTitle=`Items which start with '${prefix}'`;
-            }
         }
-        titleContainer.innerHTML=newTitle;        
-    }
+        titleContainer.innerHTML = newTitle;
+    };
+    //turn on loader
+    var turnOnLoader=function() {
+        if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+            document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
+        }
+    };
 
     var Events = {
-        loadDocument: function(){
-            window.addEventListener('load',function(){
+        loadDocument: function () {
+            window.addEventListener('load', function () {
                 data.loadSavedCharacter(printItems);
             });
             document.getElementsByClassName(DOMstrings.search)[0].focus();
@@ -110,7 +134,7 @@ var UIController = (function (data) {
         },
         typeSearchCharacter: function () {
             var type;
-            var searchEl=document.getElementsByClassName(DOMstrings.search)[0];
+            var searchEl = document.getElementsByClassName(DOMstrings.search)[0];
             //set timeout for typing and call loadAjax
             function callData() {
                 if (type !== undefined) {
@@ -118,32 +142,39 @@ var UIController = (function (data) {
                 }
                 type = setTimeout(
                     function () {
-                        let prefix=searchEl.value;
+                        let prefix = searchEl.value;
                         console.log(prefix);
-                        if(prefix){
-                            data.loadAjax(prefix,printItems);
+                        if (prefix) {
+                            data.resetUrlData();
+                            data.loadAjax(prefix, printItems);
+                        } else {
+                            printItems(data.getSavedItems, "saved",0,0);
                         }
-                        else{
-                            printItems(data.getSavedItems,"saved");
-                        }
-                        
+
                     }, 1000);
-            }
-            //turn on loader
-            function turnOnLoader(){
-                if(document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")){
-                    document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
-                }
             }
             searchEl.addEventListener('input', callData);
             searchEl.addEventListener('input', turnOnLoader);
+        },
+        changePage: function(){
+            document.addEventListener('click', function (ev) {
+                if (ev.target && ev.target.parentNode &&ev.target.parentNode.classList.contains('pagination')){
+                    console.log("Paginacija");
+                    let direction='';
+                    direction=ev.target.parentNode.getAttribute('data-direction');
+                    console.log(direction);
+                    turnOnLoader();
+                    data.changePage(direction,printItems);
+                }
+            });
         }
     };
     return {
-        Init:function(){
+        Init: function () {
             Events.changeBookmarkStatus();
             Events.typeSearchCharacter();
             Events.loadDocument();
+            Events.changePage();
         }
         /* printItems: printItems,
         events: Events */
@@ -156,6 +187,3 @@ var UIController = (function (data) {
 
 
 export default UIController;
-
-
-

@@ -15,23 +15,53 @@ var dataController = (function () {
         offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
-    //url data if have pagination
-    var newUrlData=null;
     //data about results
     var resultsData = {
         count: 0,
         limit: 20,
         offset: 0,
         total: 0,
-        page:1
+        showNext:0,
+        showPrev:0
     }
-    
+    //url data if have pagination
+    var newUrlData=null;
+    //toggle pagination arrows
+    var loadPagination=function(){
+        if(resultsData.total>(urlData.offset+urlData.limit)){
+            if(newUrlData===null){
+                newUrlData=Object.assign({}, urlData);
+            }
+            resultsData.showNext=1;
+        }
+        else{
+            resultsData.showNext=0;
+        }
+        if(urlData.offset>0){
+            resultsData.showPrev=1;
+        }
+        else{
+            resultsData.showPrev=0;
+        }
+        
+    }
+    //changePage function
+    var changePage=function(direction, printCall){
+        if(direction==="next"){
+            urlData.offset+=urlData.limit;
+        }
+        else if(direction==="prev"){
+            urlData.offset-=urlData.limit;
+        }
+        //console.log(urlData.offset);
+        loadAjax(urlData.prefix, printCall);
+    };
     //make url
     var makeUrl = function (prefix) {
-        urlData.prefix = `${prefix}&`;
+        urlData.prefix = `${prefix}`;
         let urlAddress = '';
        
-        urlAddress=`${urlData.baseUrl}${urlData.subject}${urlData.nameStartText}${urlData.prefix}limit=${urlData.limit}&offset=${urlData.offset}&${urlData.apikey}`;
+        urlAddress=`${urlData.baseUrl}${urlData.subject}${urlData.nameStartText}${urlData.prefix}&limit=${urlData.limit}&offset=${urlData.offset}&${urlData.apikey}`;
         console.log(urlAddress);
         return urlAddress;
     };
@@ -70,7 +100,7 @@ var dataController = (function () {
     //load saved Characters
     var loadSavedCharacter = function (callback) {
         if (typeof (Storage) !== "undefined" && localStorage.marvel) {
-            console.log(localStorage.getItem('marvel'));
+            //console.log(localStorage.getItem('marvel'));
             var tekst = JSON.parse(localStorage.getItem('marvel'));
             tekst.forEach(function (current) {
                 let {
@@ -81,12 +111,11 @@ var dataController = (function () {
                 } = current;
                 savedItems.push(new Character(id, name, thumbnail,isBookmarked));
             });
-            console.log("Snimljeni objekti:");
-            console.log(savedItems);
+            
         } else {
             console.log("there aren't saved characters");
         }
-        callback(savedItems,"saved");
+        callback(savedItems,"saved",0,0);
     };
     //make bookmarked Character object
     var makeSavedCharacter = function (id, name, thumbnail, isBook) {
@@ -100,27 +129,22 @@ var dataController = (function () {
     //remove bookmarked Character object
     var removeSavedCharacter = function (itemId) {
         parseInt(itemId);
-        console.log("unutar funkcije:");
-        console.log(savedItems.length);
         let indexPos = -1;
         if (savedItems.length!==0) {
-            console.log("ima clanova");
             indexPos = savedItems.findIndex(function (current) {
-                console.log(current.id);
-                console.log(itemId);
                 return current.id === itemId;
             });
-            console.log("indexPos " + indexPos);
+            //console.log("indexPos " + indexPos);
             if (indexPos !== -1) {
                 savedItems.splice(indexPos, 1);
                 localStorage.setItem("marvel", JSON.stringify(savedItems));
-                console.log("obrisan clan niza");
+                //console.log("obrisan clan niza");
                 if (savedItems.length===0) {
                     localStorage.removeItem("marvel");
                 }
             }
         } else {
-            console.log("nema clanova");
+            //console.log("nema clanova");
         }
     };
 
@@ -137,22 +161,16 @@ var dataController = (function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 if (xhr.status == 200) {
                     let dataObj = JSON.parse(xhr.responseText);
-                    console.log(dataObj);
+                    //console.log(dataObj);
                     let {
-                        count,
-                        limit,
-                        offset,
-                        results,
+                        results, 
                         total
                     } = dataObj.data;
-                    resultsData.count = count;
-                    resultsData.limit = limit;
-                    resultsData.offset = offset;
                     resultsData.total = total;
                     makeCharacter(results);
                     checkIsBookmarked(loadedItems);
-                    //changePage();
-                    callback(loadedItems,"loaded");
+                    loadPagination();
+                    callback(loadedItems,"loaded",resultsData.showPrev,resultsData.showNext);
                 } else if (xhr.status >= 400) {
                     callback(loadedItems,"error")
                     console.log('There was an error.');
@@ -161,7 +179,15 @@ var dataController = (function () {
         }
         xhr.open('GET', urlAddress, true);
         xhr.send();
-    }
+    };
+    //reset url data
+    var resetUrlData=function(){
+        if(newUrlData!==null){
+            urlData=Object.assign({}, newUrlData);
+            newUrlData=null;
+            //console.log("resetovan url");
+        }
+    };
 
     return {
         urlData: urlData,
@@ -170,7 +196,9 @@ var dataController = (function () {
         makeSavedCharacter: makeSavedCharacter,
         removeSavedCharacter: removeSavedCharacter,
         getLoadedItems: loadedItems,
-        getSavedItems: savedItems
+        getSavedItems: savedItems,
+        changePage: changePage,
+        resetUrlData:resetUrlData
     };
 })();
 
