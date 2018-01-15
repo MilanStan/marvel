@@ -1,5 +1,5 @@
 .main-container{
-    min-height:100vh;
+    height:100vh;
     background-image:url('../img/dual-ring-big.gif');
     background-size:200px 200px;
     background-color: $bg-color;
@@ -49,29 +49,17 @@
         background-color:$letter-bg;
         opacity:0;
         transition: 0.4s;
+        overflow:auto;
         &.shown{
             opacity: 1;
         }
         .item-wrapper{
-            width:100%;
-            height:8.33%;
+            width:25%;
+            height:30vh;
             position:relative;
             background-image:url('../img/dual-ring-small.gif');
             background-size:50px 50px;
             @extend %background;
-            @media (min-width:481px){
-                width:50%;
-                height:16.66%;
-            }
-            @media (min-width:768px){
-                width:33.33%;
-                height:25%
-            }
-            @media (min-width:992px){
-                width:25%;
-                //height:20%;
-                height:33.33%;
-            }
 
             .image-wrapper{
                 position:absolute;
@@ -120,20 +108,17 @@
         display:none;
         color:$letter-bg;
         font-size:40px;
-        cursor:pointer;
-        opacity:0.5;
-        transition:0.5s;
-        &:hover{
-            opacity:1;
+        .glyphicon{
+            cursor:pointer;
         }
         &.active{
             display:block;
         }
         &.next{
-            right:10px;
+            right:20px;
         }
         &.prev{
-            left:10px;
+            left:20px;
         }
         .glyphicon-triangle-right{
             margin-top: 15px;
@@ -170,6 +155,10 @@
     .main-container .main-wrapper .item-wrapper .name{
         font-size:18px;
     }
+    .main-container .main-wrapper .item-wrapper{
+        width: 33.33%;
+        height:22.5vh;
+    }
     .main-container header .input-container .search-input{
         font-size:21px;
     }
@@ -180,6 +169,10 @@
     }
     .main-container .main-wrapper{
         height:88vh;
+    }
+    .main-container .main-wrapper .item-wrapper{
+        width:50%;
+        height:22vh;
     }
     .main-container header .title-container{
         width:100%;
@@ -198,8 +191,8 @@
         height:initial;
         .search-input{
             text-align:center;
-            margin:0 2.5%;
-            width:95%;
+            margin:0 5%;
+            width:90%;
             right:0;
             position:relative;
             top:0;
@@ -219,14 +212,14 @@
         line-height: 50px;
         opacity:1;
     }
-    .main-container .pagination.prev{
+    /* .main-container .pagination.prev{
         left:50%;
         margin-left:-70px;
     }
     .main-container .pagination.next{
         right:50%;
         margin-right:-70px;
-    }
+    } */
     .main-container .pagination .glyphicon-triangle-right,
     .main-container .pagination .glyphicon-triangle-left{
         margin-top:5px;
@@ -236,7 +229,23 @@
     .main-container .main-wrapper .item-wrapper .name{
         font-size:15px;
     } 
+    .main-container .main-wrapper .item-wrapper{
+        width:50%;
+        height:29.33vh;
+    }
     .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
-        font-size:3px;
+        font-size:30px;
+    }
+}
+@media (max-width:480px){
+    .main-container .main-wrapper .item-wrapper{
+        width:100%;
+        height:22vh;
+    }
+    .main-container header .title-container{
+        font-size:16px;
+    }
+    .main-container header .input-container .search-input{
+        font-size:15px;
     }
 }

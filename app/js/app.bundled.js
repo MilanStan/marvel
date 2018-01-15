@@ -291,14 +291,14 @@ var dataController = function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: 12,
+        limit: 20,
         offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };
     //data about results
     var resultsData = {
         count: 0,
-        limit: 20,
+        //limit: 20,
         offset: 0,
         total: 0,
         showNext: 0,
