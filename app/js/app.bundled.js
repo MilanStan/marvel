@@ -122,6 +122,8 @@ var UIController = function (data) {
         if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
         }
+        //load images
+        loadImg();
         //change title
         changeTitle(charactersArray.length, typeTitle);
         //switch pagination
@@ -144,13 +146,28 @@ var UIController = function (data) {
     };
     //method for printing one item
     var printItem = function printItem(characterItem) {
-        var output = "<div class=\"item-wrapper\">\n            <div class=\"image-wrapper\" style='" + getImage(characterItem.thumbnail) + "'></div>\n            <div class=\"name\">" + characterItem.name + "</div>\n            <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n                " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">') + "\n                </span>\n            </div>\n        </div>";
+        var output = "<div class=\"item-wrapper\">\n        <div class=\"image-wrapper\" style=\"background-image:url(" + getImage(characterItem.thumbnail) + ")\">\n            <img class=\"img-invisible\" src=\"" + getImage(characterItem.thumbnail) + "\" alt=\"" + characterItem.name + "\"/>\n        </div>\n        <div class=\"name\">" + characterItem.name + "</div>\n        <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n            " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">') + "\n            </span>\n        </div>\n    </div>";
         return output;
     };
     //method for getting background image
     var getImage = function getImage(thumbnail) {
         var output = '';
-        output = "\n        background-image:url(\"" + thumbnail.path + "/detail." + thumbnail.extension + "\");\n        ";
+        output = thumbnail.path + "/detail." + thumbnail.extension;
+        /* output=
+        `
+        <picture>
+            <source srcset='${thumbnail.path}/portrait_incredible.${thumbnail.extension}' media='(max-width: 220px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(max-width: 300px)'>
+            <source srcset='${thumbnail.path}/detail.${thumbnail.extension}' media='(max-width: 480px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 481px) and (max-width:560px)'>
+            <source srcset='${thumbnail.path}/landscape_incredible.${thumbnail.extension}' media='(min-width: 561px) and (max-width:771px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 772px) and (max-width:900px)'>
+            <source srcset='${thumbnail.path}/landscape_incredible.${thumbnail.extension}' media='(min-width: 901px) and (max-width:991px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 992px) and (max-width:1200px)'>
+            <source srcset='${thumbnail.path}/detail.${thumbnail.extension}' media='(min-width: 1201px)'>
+                  <img src='${thumbnail.path}/detail.${thumbnail.extension}' alt='${name}'>
+        </picture>
+        `; */
         return output;
     };
     //change title
@@ -183,7 +200,17 @@ var UIController = function (data) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
         }
     };
-
+    //show image on load
+    var loadImg = function loadImg() {
+        var images = document.getElementsByClassName('img-invisible');
+        var imagesArray = Array.from(images);
+        imagesArray.forEach(function (current) {
+            current.addEventListener('load', function () {
+                var parent = current.parentNode;
+                parent.classList.add("loaded");
+            });
+        });
+    };
     var Events = {
         loadDocument: function loadDocument() {
             window.addEventListener('load', function () {

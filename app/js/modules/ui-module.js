@@ -27,6 +27,8 @@ var UIController = (function (data) {
         if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
         }
+        //load images
+        loadImg();
         //change title
         changeTitle(charactersArray.length, typeTitle);
         //switch pagination
@@ -51,24 +53,40 @@ var UIController = (function (data) {
     var printItem = characterItem => {
         let output =
             `<div class="item-wrapper">
-            <div class="image-wrapper" style='${getImage(characterItem.thumbnail)}'></div>
-            <div class="name">${characterItem.name}</div>
-            <div class="bookmark" data-id="${characterItem.id}" data-name="${characterItem.name}" data-path="${characterItem.thumbnail.path}" data-extension="${characterItem.thumbnail.extension}" data-isbook="${characterItem.isBookmarked?'true':'false'}">
-                ${characterItem.isBookmarked?
-                    '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">':
-                    '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">'
-                }
-                </span>
-            </div>
-        </div>`;
+        <div class="image-wrapper" style="background-image:url(${getImage(characterItem.thumbnail)})">
+            <img class="img-invisible" src="${getImage(characterItem.thumbnail)}" alt="${characterItem.name}"/>
+        </div>
+        <div class="name">${characterItem.name}</div>
+        <div class="bookmark" data-id="${characterItem.id}" data-name="${characterItem.name}" data-path="${characterItem.thumbnail.path}" data-extension="${characterItem.thumbnail.extension}" data-isbook="${characterItem.isBookmarked?'true':'false'}">
+            ${characterItem.isBookmarked?
+                '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">':
+                '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">'
+            }
+            </span>
+        </div>
+    </div>`;
         return output;
     };
     //method for getting background image
-    var getImage = thumbnail => {
+    var getImage = (thumbnail) => {
         let output = '';
-        output = `
-        background-image:url("${thumbnail.path}/detail.${thumbnail.extension}");
-        `;
+        output = `${thumbnail.path}/detail.${thumbnail.extension}`;
+        /* output=
+        `
+        <picture>
+            <source srcset='${thumbnail.path}/portrait_incredible.${thumbnail.extension}' media='(max-width: 220px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(max-width: 300px)'>
+            <source srcset='${thumbnail.path}/detail.${thumbnail.extension}' media='(max-width: 480px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 481px) and (max-width:560px)'>
+            <source srcset='${thumbnail.path}/landscape_incredible.${thumbnail.extension}' media='(min-width: 561px) and (max-width:771px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 772px) and (max-width:900px)'>
+            <source srcset='${thumbnail.path}/landscape_incredible.${thumbnail.extension}' media='(min-width: 901px) and (max-width:991px)'>
+            <source srcset='${thumbnail.path}/portrait_uncanny.${thumbnail.extension}' media='(min-width: 992px) and (max-width:1200px)'>
+            <source srcset='${thumbnail.path}/detail.${thumbnail.extension}' media='(min-width: 1201px)'>
+
+                <img src='${thumbnail.path}/detail.${thumbnail.extension}' alt='${name}'>
+        </picture>
+        `; */
         return output;
     };
     //change title
@@ -96,12 +114,22 @@ var UIController = (function (data) {
         titleContainer.innerHTML = newTitle;
     };
     //turn on loader
-    var turnOnLoader=function() {
+    var turnOnLoader = function () {
         if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
         }
     };
-
+    //show image on load
+    var loadImg = function () {
+        let images = document.getElementsByClassName('img-invisible');
+        let imagesArray = Array.from(images);
+        imagesArray.forEach(current => {
+            current.addEventListener('load', () => {
+                let parent = current.parentNode;
+                parent.classList.add("loaded");
+            });
+        });
+    };
     var Events = {
         loadDocument: function () {
             window.addEventListener('load', function () {
@@ -148,7 +176,7 @@ var UIController = (function (data) {
                             data.resetUrlData();
                             data.loadAjax(prefix, printItems);
                         } else {
-                            printItems(data.getSavedItems, "saved",0,0);
+                            printItems(data.getSavedItems, "saved", 0, 0);
                         }
 
                     }, 1000);
@@ -156,18 +184,18 @@ var UIController = (function (data) {
             searchEl.addEventListener('input', callData);
             searchEl.addEventListener('input', turnOnLoader);
         },
-        changePage: function(){
+        changePage: function () {
             document.addEventListener('click', function (ev) {
-                if (ev.target && ev.target.parentNode &&ev.target.parentNode.classList.contains('pagination')){
+                if (ev.target && ev.target.parentNode && ev.target.parentNode.classList.contains('pagination')) {
                     console.log("Paginacija");
-                    let direction='';
-                    direction=ev.target.parentNode.getAttribute('data-direction');
+                    let direction = '';
+                    direction = ev.target.parentNode.getAttribute('data-direction');
                     console.log(direction);
                     turnOnLoader();
-                    data.changePage(direction,printItems);
+                    data.changePage(direction, printItems);
                 }
             });
-        }
+        },
     };
     return {
         Init: function () {

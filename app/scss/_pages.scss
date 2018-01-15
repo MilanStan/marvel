@@ -5,6 +5,7 @@
     background-color: $bg-color;
     @extend %background;
     position:relative;
+    overflow:hidden;
     header{
         height:10vh;
         text-align: center;
@@ -66,7 +67,18 @@
                 background-position-y:top;
                 width:100%;
                 height:100%;
+                overflow:hidden;
                 @extend %background;
+                opacity:0;
+                transition:0.7s;
+                //transform:scale(0.5);
+                .img-invisible{
+                    visibility: hidden;
+                }
+                &.loaded{
+                    opacity:1;
+                    //transform: scale(1);
+                }
             }
             .name{
                 position:absolute;
@@ -164,24 +176,28 @@
     }
 }
 @media (max-width:771px){
+    .main-container{
+        background-size:100px 100px;
+    }
     .main-container header{
-        height:12vh;
+        height:14vh;
     }
     .main-container .main-wrapper{
-        height:88vh;
+        height:86vh;
     }
     .main-container .main-wrapper .item-wrapper{
         width:50%;
-        height:22vh;
+        height:21.5vh;
     }
     .main-container header .title-container{
         width:100%;
         position:relative;
-        height:6vh;
-        line-height:6vh;
+        height:7vh;
+        line-height:initial;
         font-size:22px;
         text-align:center;
         padding-left:0;
+        padding-top:5px;
     }
     .main-container header .input-container{
         position:relative;
@@ -231,7 +247,7 @@
     } 
     .main-container .main-wrapper .item-wrapper{
         width:50%;
-        height:29.33vh;
+        height:28.66vh;
     }
     .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
         font-size:30px;
@@ -240,7 +256,7 @@
 @media (max-width:480px){
     .main-container .main-wrapper .item-wrapper{
         width:100%;
-        height:22vh;
+        height:21.5vh;
     }
     .main-container header .title-container{
         font-size:16px;
