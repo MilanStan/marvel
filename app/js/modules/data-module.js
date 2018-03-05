@@ -11,7 +11,7 @@ var dataController = (function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: 20,
+        limit: 12,
         offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };

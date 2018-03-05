@@ -102,6 +102,7 @@ var UIController = function (data) {
         search: "search-input",
         mainContainer: "main-container",
         mainWrapper: "main-wrapper",
+        startBgContainer: "start-bg-container",
         itemWrapper: "item-wrapper",
         bookmark: "bookmark",
         prev: "prev",
@@ -118,10 +119,14 @@ var UIController = function (data) {
         document.getElementsByClassName(DOMstrings.mainWrapper)[0].innerHTML = output;
         //return output;
 
-        //turn off loader - show container
-        if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+        //turn off loader - show container if charactersArray has elements
+        if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown") && charactersArray.length > 0) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
         }
+        //turn on background if charactersArray hasn't elements
+        else if (charactersArray.length === 0 && document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains('fade-out')) {
+                document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.remove('fade-out');
+            }
         //load images
         loadImg();
         //change title
@@ -198,6 +203,9 @@ var UIController = function (data) {
     var turnOnLoader = function turnOnLoader() {
         if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
+        }
+        if (!document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains("fade-out")) {
+            document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.add('fade-out');
         }
     };
     //show image on load
@@ -318,7 +326,7 @@ var dataController = function () {
         subject: "characters?",
         nameStartText: "nameStartsWith=",
         prefix: "",
-        limit: 20,
+        limit: 12,
         offset: 0,
         apikey: "apikey=9cc6908bc626709046be238c2c177a07"
     };

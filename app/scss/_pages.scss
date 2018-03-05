@@ -6,6 +6,43 @@
     @extend %background;
     position:relative;
     overflow:hidden;
+    .start-bg-container{
+        position:absolute;
+        top:10vh;
+        height:90vh;
+        left:0;
+        width:100vw;
+        background-image:url('../img/marvel-bg.jpg');
+        background-repeat:no-repeat;
+        background-size:cover;
+        background-position: center bottom;
+        opacity:1;
+        transition:0.5s;
+        display:flex;
+        align-items:center;
+        overflow:hidden;
+        z-index:40;
+        &.fade-out{
+            opacity:0;
+        }
+        h1{
+            position:relative;
+            text-align:center;
+            text-shadow:3px 3px 3px white,-3px -3px 3px white,3px -3px 3px white, -3px 3px 3px white;
+            font-size:70px;
+            font-weight:bold;
+            color:$letter-bg;
+            width:70%;
+            left:15%;
+            font-family: 'Luckiest Guy', cursive;
+            span{
+                background-color:$letter-bg;
+                color: white;
+                text-shadow:none;
+                padding:0 10px;
+            }
+        }
+    }
     header{
         height:10vh;
         text-align: center;
@@ -20,6 +57,8 @@
             @extend %absolute;
             text-align:left;
             padding-left:20px;
+            display:flex;
+            align-items:center;
         }
         .input-container{
             @extend %absolute;
@@ -51,6 +90,8 @@
         opacity:0;
         transition: 0.4s;
         overflow:auto;
+        position:relative;
+        z-index:50;
         &.shown{
             opacity: 1;
         }
@@ -120,6 +161,7 @@
         display:none;
         color:$letter-bg;
         font-size:40px;
+        z-index:60;
         .glyphicon{
             cursor:pointer;
         }
@@ -143,7 +185,9 @@
     }
 }
 @media (max-width:1450px){
-    
+    .main-container .start-bg-container h1{
+        font-size:60px;
+    }    
     .main-container header .title-container{
         width:60%;
         font-size:28px;
@@ -174,6 +218,12 @@
     .main-container header .input-container .search-input{
         font-size:21px;
     }
+    .main-container .start-bg-container{
+        background-image:url('../img/marvel-bg-1024x768.jpg');
+    }
+    .main-container .start-bg-container h1{
+        font-size:52px;
+    }
 }
 @media (max-width:771px){
     .main-container{
@@ -196,6 +246,7 @@
         line-height:initial;
         font-size:22px;
         text-align:center;
+        justify-content:center;
         padding-left:0;
         padding-top:5px;
     }
@@ -228,6 +279,14 @@
         line-height: 50px;
         opacity:1;
     }
+    .main-container .start-bg-container{
+        top:14vh;
+        height:86vh;
+        background-image:url('../img/marvel-bg-768x1024.jpg');
+        h1{
+            font-size:45px;
+        }
+    }
     /* .main-container .pagination.prev{
         left:50%;
         margin-left:-70px;
@@ -252,6 +311,9 @@
     .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
         font-size:30px;
     }
+    .main-container .start-bg-container h1{
+        font-size:38px;
+    }
 }
 @media (max-width:480px){
     .main-container .main-wrapper .item-wrapper{
@@ -263,5 +325,11 @@
     }
     .main-container header .input-container .search-input{
         font-size:15px;
+    }
+    .main-container .start-bg-container{
+        background-image:url('../img/marvel-bg-360x640.jpg');
+    }
+    .main-container .start-bg-container h1{
+        font-size:34px;
     }
 }
