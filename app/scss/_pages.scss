@@ -68,7 +68,8 @@
             .search-input {
                 position: absolute;
                 top: 50%;
-                right: 2%;
+                left: 2%;
+                margin-right:2%;
                 margin-top: -23px;
                 width: 70%;
                 background-color: white;
@@ -78,6 +79,32 @@
                 border: none;
                 padding-top: 12px;
                 font-size: 26px;
+            }
+            .saved-items{
+                position:absolute;
+                top:50%;
+                right:2%;
+                margin-top:-23px;
+                width:24%;
+                border-radius:6px;
+                font-size:16px;
+                background-color:$letter-bg;
+                color:white;
+                text-transform:uppercase;
+                font-weight:bold;
+                outline:none;
+                border:2px solid white;
+                transition:0.5s;
+                &:hover{
+                    color:$letter-bg;
+                    background-color:white;
+                    border:2px solid white;
+                }
+                .glyphicon{
+                    color:yellow;
+                    text-shadow:1px 1px 0px black, -1px -1px 0px black,1px -1px 0 black,-1px 1px 0 black;
+                    padding:5px 5px 0 0;
+                }
             }
         }
     }
@@ -108,7 +135,7 @@
                 position: absolute;
                 //background-position-y: top;
                 width: 100%;
-                height: 30vh;
+                height: 100%;
                 overflow: hidden;
                 //@extend %background;
                 //opacity: 0;
@@ -194,15 +221,15 @@
         font-size: 60px;
     }
     .main-container header .title-container {
-        width: 60%;
+        width: 50%;
         font-size: 28px;
     }
     .main-container header .input-container {
-        left: 60%;
-        width: 40%;
+        left: 50%;
+        width: 50%;
         .search-input {
             font-size: 21px;
-            width: 95%;
+            width: 70%;
         }
     }
     .main-container .main-wrapper .item-wrapper .name {
@@ -263,15 +290,27 @@
         left: 0;
         width: 100%;
         height: initial;
+        text-align:left;
         .search-input {
-            text-align: center;
-            margin: 0 5%;
-            width: 90%;
-            right: 0;
-            position: relative;
-            top: 0;
+            position:relative;
+            //text-align: center;
+            //margin: 0 5%;
+            //width: 90%;
+            //right: 0;
+            //position: relative;
+            top:7px;
             font-size: 18px;
-            height: 36px;
+            height: 40px;//bilo 36px
+        }
+        .saved-items{
+            margin-top:-19px;
+            height:40px;
+            padding-top:4px;
+            &:hover{
+                background-color:initial;
+                color:inherit;
+                border:2px solid white;
+            }
         }
     }
     .main-container .main-wrapper .item-wrapper .name {
@@ -340,5 +379,13 @@
     }
     .main-container .start-bg-container h1 {
         font-size: 34px;
+    }
+    //saved button
+    .main-container header .input-container .saved-items{
+        font-size:12px;
+        font-weight:bold;
+        .glyphicon{
+            padding:5px 0 0 0;
+        }
     }
 }

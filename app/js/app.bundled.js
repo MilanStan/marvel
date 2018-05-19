@@ -106,7 +106,8 @@ var UIController = function (data) {
         itemWrapper: "item-wrapper",
         bookmark: "bookmark",
         prev: "prev",
-        next: "next"
+        next: "next",
+        savedItemsBtn: "saved-items"
     };
     //method for printing character items
     var printItems = function printItems(charactersArray, typeTitle, prev, next) {
@@ -290,6 +291,14 @@ var UIController = function (data) {
                     data.changePage(direction, printItems);
                 }
             });
+        },
+        //click on saved button
+        loadSavedItems: function loadSavedItems() {
+            var savedBtn = document.getElementsByClassName(DOMstrings.savedItemsBtn)[0];
+            savedBtn.addEventListener('click', function () {
+                printItems(data.getSavedItems, "saved", 0, 0);
+                document.getElementsByClassName(DOMstrings.search)[0].value = "";
+            });
         }
     };
     return {
@@ -298,6 +307,7 @@ var UIController = function (data) {
             Events.typeSearchCharacter();
             Events.loadDocument();
             Events.changePage();
+            Events.loadSavedItems();
         }
         /* printItems: printItems,
         events: Events */
