@@ -27,10 +27,12 @@ var UIController = (function (data) {
         //turn off loader - show container if charactersArray has elements
         if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown") && charactersArray.length>0) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.remove('loading');
         }
         //turn on background if charactersArray hasn't elements
         else if(charactersArray.length===0 && document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains('fade-out')){
             document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.remove('fade-out');
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.remove('loading');
         }
         //load images
         loadImg();
@@ -57,9 +59,9 @@ var UIController = (function (data) {
     //method for printing one item
     var printItem = characterItem => {
         let output =
-            `<div class="item-wrapper">
-        <div class="image-wrapper" style="background-image:url(${getImage(characterItem.thumbnail)})">
-            <img class="img-invisible" src="${getImage(characterItem.thumbnail)}" alt="${characterItem.name}"/>
+            `<div class="item-wrapper loading">
+        <div class="image-wrapper">
+            <img class="img-item" src="${getImage(characterItem.thumbnail)}" alt="${characterItem.name}" data-object-fit="cover"/>
         </div>
         <div class="name">${characterItem.name}</div>
         <div class="bookmark" data-id="${characterItem.id}" data-name="${characterItem.name}" data-path="${characterItem.thumbnail.path}" data-extension="${characterItem.thumbnail.extension}" data-isbook="${characterItem.isBookmarked?'true':'false'}">
@@ -121,20 +123,26 @@ var UIController = (function (data) {
     //turn on loader
     var turnOnLoader = function () {
         if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.add('loading');
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
         }
         if(!document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains("fade-out")){
             document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.add('fade-out');
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.add('loading');
         }
     };
     //show image on load
     var loadImg = function () {
-        let images = document.getElementsByClassName('img-invisible');
+        let images = document.getElementsByClassName('img-item');
         let imagesArray = Array.from(images);
         imagesArray.forEach(current => {
-            current.addEventListener('load', () => {
+            current.addEventListener('load', () => {   
+                objectFitPolyfill(current);             
+                current.classList.add('loaded');
                 let parent = current.parentNode;
-                parent.classList.add("loaded");
+                //parent.classList.add("loaded");
+                //remove loading png on img load
+                parent.parentNode.classList.remove('loading');
             });
         });
     };

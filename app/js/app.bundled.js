@@ -122,10 +122,12 @@ var UIController = function (data) {
         //turn off loader - show container if charactersArray has elements
         if (!document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown") && charactersArray.length > 0) {
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.add('shown');
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.remove('loading');
         }
         //turn on background if charactersArray hasn't elements
         else if (charactersArray.length === 0 && document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains('fade-out')) {
                 document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.remove('fade-out');
+                document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.remove('loading');
             }
         //load images
         loadImg();
@@ -151,7 +153,7 @@ var UIController = function (data) {
     };
     //method for printing one item
     var printItem = function printItem(characterItem) {
-        var output = "<div class=\"item-wrapper\">\n        <div class=\"image-wrapper\" style=\"background-image:url(" + getImage(characterItem.thumbnail) + ")\">\n            <img class=\"img-invisible\" src=\"" + getImage(characterItem.thumbnail) + "\" alt=\"" + characterItem.name + "\"/>\n        </div>\n        <div class=\"name\">" + characterItem.name + "</div>\n        <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n            " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">') + "\n            </span>\n        </div>\n    </div>";
+        var output = "<div class=\"item-wrapper loading\">\n        <div class=\"image-wrapper\">\n            <img class=\"img-item\" src=\"" + getImage(characterItem.thumbnail) + "\" alt=\"" + characterItem.name + "\" data-object-fit=\"cover\"/>\n        </div>\n        <div class=\"name\">" + characterItem.name + "</div>\n        <div class=\"bookmark\" data-id=\"" + characterItem.id + "\" data-name=\"" + characterItem.name + "\" data-path=\"" + characterItem.thumbnail.path + "\" data-extension=\"" + characterItem.thumbnail.extension + "\" data-isbook=\"" + (characterItem.isBookmarked ? 'true' : 'false') + "\">\n            " + (characterItem.isBookmarked ? '<span class="glyphicon glyphicon-star" aria-hidden="true" title="Remove from bookmarks">' : '<span class="glyphicon glyphicon-star-empty" aria-hidden="true" title="Add to bookmarks">') + "\n            </span>\n        </div>\n    </div>";
         return output;
     };
     //method for getting background image
@@ -202,20 +204,26 @@ var UIController = function (data) {
     //turn on loader
     var turnOnLoader = function turnOnLoader() {
         if (document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.contains("shown")) {
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.add('loading');
             document.getElementsByClassName(DOMstrings.mainWrapper)[0].classList.remove('shown');
         }
         if (!document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.contains("fade-out")) {
             document.getElementsByClassName(DOMstrings.startBgContainer)[0].classList.add('fade-out');
+            document.getElementsByClassName(DOMstrings.mainContainer)[0].classList.add('loading');
         }
     };
     //show image on load
     var loadImg = function loadImg() {
-        var images = document.getElementsByClassName('img-invisible');
+        var images = document.getElementsByClassName('img-item');
         var imagesArray = Array.from(images);
         imagesArray.forEach(function (current) {
             current.addEventListener('load', function () {
+                objectFitPolyfill(current);
+                current.classList.add('loaded');
                 var parent = current.parentNode;
-                parent.classList.add("loaded");
+                //parent.classList.add("loaded");
+                //remove loading png on img load
+                parent.parentNode.classList.remove('loading');
             });
         });
     };

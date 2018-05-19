@@ -1,290 +1,297 @@
-.main-container{
-    height:100vh;
-    background-image:url('../img/dual-ring-big.gif');
-    background-size:200px 200px;
-    background-color: $bg-color;
-    @extend %background;
-    position:relative;
-    overflow:hidden;
-    .start-bg-container{
-        position:absolute;
-        top:10vh;
-        height:90vh;
-        left:0;
-        width:100vw;
-        background-image:url('../img/marvel-bg.jpg');
-        background-repeat:no-repeat;
-        background-size:cover;
+.main-container {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    &.loading {
+        background-image: url('../img/dual-ring-big.gif');
+        background-size: 200px 200px;
+        background-color: $bg-color;
+        @extend %background;
+    }
+    .start-bg-container {
+        position: absolute;
+        top: 10vh;
+        height: 90vh;
+        left: 0;
+        width: 100vw;
+        background-image: url('../img/marvel-bg.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
         background-position: center bottom;
-        opacity:1;
-        transition:0.5s;
-        display:flex;
-        align-items:center;
-        overflow:hidden;
-        z-index:40;
-        &.fade-out{
-            opacity:0;
+        opacity: 1;
+        transition: 0.5s;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        z-index: 40;
+        &.fade-out {
+            opacity: 0;
         }
-        h1{
-            position:relative;
-            text-align:center;
-            text-shadow:3px 3px 3px white,-3px -3px 3px white,3px -3px 3px white, -3px 3px 3px white;
-            font-size:70px;
-            font-weight:bold;
-            color:$letter-bg;
-            width:70%;
-            left:15%;
+        h1 {
+            position: relative;
+            text-align: center;
+            text-shadow: 3px 3px 3px white, -3px -3px 3px white, 3px -3px 3px white, -3px 3px 3px white;
+            font-size: 70px;
+            font-weight: bold;
+            color: $letter-bg;
+            width: 70%;
+            left: 15%;
             font-family: 'Luckiest Guy', cursive;
-            span{
-                background-color:$letter-bg;
+            span {
+                background-color: $letter-bg;
                 color: white;
-                text-shadow:none;
-                padding:0 10px;
+                text-shadow: none;
+                padding: 0 10px;
             }
         }
     }
-    header{
-        height:10vh;
-        text-align: center;
-        //padding-top:20px;
-        background-color:$letter-bg;
-        color:white;
-        text-transform:uppercase;
-        position:relative;
-        .title-container{
-            font-weight:bold;
-            line-height:10vh;
+    header {
+        height: 10vh;
+        text-align: center; //padding-top:20px;
+        background-color: $letter-bg;
+        color: white;
+        text-transform: uppercase;
+        position: relative;
+        .title-container {
+            font-weight: bold;
+            line-height: 10vh;
             @extend %absolute;
-            text-align:left;
-            padding-left:20px;
-            display:flex;
-            align-items:center;
+            text-align: left;
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
         }
-        .input-container{
+        .input-container {
             @extend %absolute;
-            text-align:right;
-            left:50%;
-            .search-input{
-                position:absolute;
-                top:50%;
-                right:2%;
-                margin-top:-23px;
-                width:70%;
-                background-color:white;
+            text-align: right;
+            left: 50%;
+            .search-input {
+                position: absolute;
+                top: 50%;
+                right: 2%;
+                margin-top: -23px;
+                width: 70%;
+                background-color: white;
                 color: $letter-bg;
-                font-weight:bold;
+                font-weight: bold;
                 text-transform: uppercase;
-                border:none;
-                padding-top:12px;
-                font-size:26px;
+                border: none;
+                padding-top: 12px;
+                font-size: 26px;
             }
         }
-       
     }
-    .main-wrapper{
-        height:90vh;
-        display:flex;
-        flex-wrap:wrap;
-        align-content:start;
-        background-color:$letter-bg;
-        opacity:0;
+    .main-wrapper {
+        height: 90vh;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: start;
+        background-color: $letter-bg;
+        opacity: 0;
         transition: 0.4s;
-        overflow:auto;
-        position:relative;
-        z-index:50;
-        &.shown{
+        overflow: auto;
+        position: relative;
+        z-index: 50;
+        &.shown {
             opacity: 1;
         }
-        .item-wrapper{
-            width:25%;
-            height:30vh;
-            position:relative;
-            background-image:url('../img/dual-ring-small.gif');
-            background-size:50px 50px;
-            @extend %background;
-
-            .image-wrapper{
-                position:absolute;
-                background-position-y:top;
-                width:100%;
-                height:100%;
-                overflow:hidden;
+        .item-wrapper {
+            width: 25%;
+            height: 30vh;
+            position: relative;
+            &.loading{
+                background-image: url('../img/dual-ring-small.gif');
+                background-size: 50px 50px;
                 @extend %background;
-                opacity:0;
-                transition:0.7s;
-                //transform:scale(0.5);
-                .img-invisible{
-                    visibility: hidden;
-                }
-                &.loaded{
-                    opacity:1;
-                    //transform: scale(1);
+            }
+            .image-wrapper {
+                position: absolute;
+                //background-position-y: top;
+                width: 100%;
+                height: 30vh;
+                overflow: hidden;
+                //@extend %background;
+                //opacity: 0;
+                //transition: 0.7s; //transform:scale(0.5);
+                .img-item {
+                    width:100%;
+                    height:100%;
+                    object-fit: cover;
+                    object-position: left top;
+                    opacity:0;
+                    transition:0.7s;
+                    //display:none;
+                    &.loaded {
+                        opacity: 1; //transform: scale(1);
+                    }
                 }
             }
-            .name{
-                position:absolute;
-                bottom:0;
-                left:0;
-                background-color:$letter-bg;
-                color:white;
-                padding:5px;
-                font-size:30px;
-                font-weight:bold;
+            .name {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                background-color: $letter-bg;
+                color: white;
+                padding: 5px;
+                font-size: 30px;
+                font-weight: bold;
                 text-transform: uppercase;
             }
-            .bookmark{
-                position:absolute;
-                top:5px;
-                right:5px;
-                font-size:36px;
-                cursor: pointer;
-                //font-weight:bold;
-                .glyphicon-star{
-                    color:yellow;
-                    font-size:44px;
+            .bookmark {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                font-size: 36px;
+                cursor: pointer; //font-weight:bold;
+                .glyphicon-star {
+                    color: yellow;
+                    font-size: 44px;
                 }
-                .glyphicon-star-empty{
-                    color:white;
+                .glyphicon-star-empty {
+                    color: white;
                 }
             }
         }
     }
-    .pagination{
-        position:absolute;
-        width:70px;
-        height:70px;
-        border-radius:100%;
-        background-color:white;
-        line-height:70px;
-        text-align:center;
-        bottom:10px;
-        display:none;
-        color:$letter-bg;
-        font-size:40px;
-        z-index:60;
-        .glyphicon{
-            cursor:pointer;
+    .pagination {
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        border-radius: 100%;
+        background-color: white;
+        line-height: 70px;
+        text-align: center;
+        bottom: 10px;
+        display: none;
+        color: $letter-bg;
+        font-size: 40px;
+        z-index: 60;
+        .glyphicon {
+            cursor: pointer;
         }
-        &.active{
-            display:block;
+        &.active {
+            display: block;
         }
-        &.next{
-            right:20px;
+        &.next {
+            right: 20px;
         }
-        &.prev{
-            left:20px;
+        &.prev {
+            left: 20px;
         }
-        .glyphicon-triangle-right{
+        .glyphicon-triangle-right {
             margin-top: 15px;
             margin-left: 5px;
         }
-        .glyphicon-triangle-left{
+        .glyphicon-triangle-left {
             margin-top: 15px;
             margin-right: 5px;
         }
     }
 }
-@media (max-width:1450px){
-    .main-container .start-bg-container h1{
-        font-size:60px;
-    }    
-    .main-container header .title-container{
-        width:60%;
-        font-size:28px;
+
+@media (max-width:1450px) {
+    .main-container .start-bg-container h1 {
+        font-size: 60px;
     }
-    .main-container header .input-container{
-        left:60%;
-        width:40%;
-        .search-input{
-            font-size:21px;
-            width:95%;
+    .main-container header .title-container {
+        width: 60%;
+        font-size: 28px;
+    }
+    .main-container header .input-container {
+        left: 60%;
+        width: 40%;
+        .search-input {
+            font-size: 21px;
+            width: 95%;
         }
     }
-    .main-container .main-wrapper .item-wrapper .name{
-        font-size:24px;
+    .main-container .main-wrapper .item-wrapper .name {
+        font-size: 24px;
     }
 }
-@media (max-width:991px){
-    .main-container header .title-container{
-        font-size:26px;
+
+@media (max-width:991px) {
+    .main-container header .title-container {
+        font-size: 26px;
     }
-    .main-container .main-wrapper .item-wrapper .name{
-        font-size:18px;
+    .main-container .main-wrapper .item-wrapper .name {
+        font-size: 18px;
     }
-    .main-container .main-wrapper .item-wrapper{
+    .main-container .main-wrapper .item-wrapper {
         width: 33.33%;
-        height:22.5vh;
+        height: 22.5vh;
     }
-    .main-container header .input-container .search-input{
-        font-size:21px;
+    .main-container header .input-container .search-input {
+        font-size: 21px;
     }
-    .main-container .start-bg-container{
-        background-image:url('../img/marvel-bg-1024x768.jpg');
+    .main-container .start-bg-container {
+        background-image: url('../img/marvel-bg-1024x768.jpg');
     }
-    .main-container .start-bg-container h1{
-        font-size:52px;
+    .main-container .start-bg-container h1 {
+        font-size: 52px;
     }
 }
-@media (max-width:771px){
-    .main-container{
-        background-size:100px 100px;
+
+@media (max-width:771px) {
+    .main-container.loading {
+        background-size: 100px 100px;
     }
-    .main-container header{
-        height:14vh;
+    .main-container header {
+        height: 14vh;
     }
-    .main-container .main-wrapper{
-        height:86vh;
+    .main-container .main-wrapper {
+        height: 86vh;
     }
-    .main-container .main-wrapper .item-wrapper{
-        width:50%;
-        height:21.5vh;
+    .main-container .main-wrapper .item-wrapper {
+        width: 50%;
+        height: 21.5vh;
     }
-    .main-container header .title-container{
-        width:100%;
-        position:relative;
-        height:7vh;
-        line-height:initial;
-        font-size:22px;
-        text-align:center;
-        justify-content:center;
-        padding-left:0;
-        padding-top:5px;
+    .main-container header .title-container {
+        width: 100%;
+        position: relative;
+        height: 7vh;
+        line-height: initial;
+        font-size: 22px;
+        text-align: center;
+        justify-content: center;
+        padding-left: 0;
+        padding-top: 5px;
     }
-    .main-container header .input-container{
-        position:relative;
-        top:0;
-        left:0;
-        width:100%;
-        height:initial;
-        .search-input{
-            text-align:center;
-            margin:0 5%;
-            width:90%;
-            right:0;
-            position:relative;
-            top:0;
-            font-size:18px;
-            height:36px;
+    .main-container header .input-container {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: initial;
+        .search-input {
+            text-align: center;
+            margin: 0 5%;
+            width: 90%;
+            right: 0;
+            position: relative;
+            top: 0;
+            font-size: 18px;
+            height: 36px;
         }
     }
-    .main-container .main-wrapper .item-wrapper .name{
-        font-size:18px;
+    .main-container .main-wrapper .item-wrapper .name {
+        font-size: 18px;
     }
-    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
-        font-size:38px;
+    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star {
+        font-size: 38px;
     }
-    .main-container .pagination{
-        width:50px;
-        height:50px;
+    .main-container .pagination {
+        width: 50px;
+        height: 50px;
         line-height: 50px;
-        opacity:1;
+        opacity: 1;
     }
-    .main-container .start-bg-container{
-        top:14vh;
-        height:86vh;
-        background-image:url('../img/marvel-bg-768x1024.jpg');
-        h1{
-            font-size:45px;
+    .main-container .start-bg-container {
+        top: 14vh;
+        height: 86vh;
+        background-image: url('../img/marvel-bg-768x1024.jpg');
+        h1 {
+            font-size: 45px;
         }
     }
     /* .main-container .pagination.prev{
@@ -296,40 +303,42 @@
         margin-right:-70px;
     } */
     .main-container .pagination .glyphicon-triangle-right,
-    .main-container .pagination .glyphicon-triangle-left{
-        margin-top:5px;
+    .main-container .pagination .glyphicon-triangle-left {
+        margin-top: 5px;
     }
 }
-@media (max-width:559px){
-    .main-container .main-wrapper .item-wrapper .name{
-        font-size:15px;
-    } 
-    .main-container .main-wrapper .item-wrapper{
-        width:50%;
-        height:28.66vh;
+
+@media (max-width:559px) {
+    .main-container .main-wrapper .item-wrapper .name {
+        font-size: 15px;
     }
-    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star{
-        font-size:30px;
+    .main-container .main-wrapper .item-wrapper {
+        width: 50%;
+        height: 28.66vh;
     }
-    .main-container .start-bg-container h1{
-        font-size:38px;
+    .main-container .main-wrapper .item-wrapper .bookmark .glyphicon-star {
+        font-size: 30px;
+    }
+    .main-container .start-bg-container h1 {
+        font-size: 38px;
     }
 }
-@media (max-width:480px){
-    .main-container .main-wrapper .item-wrapper{
-        width:100%;
-        height:21.5vh;
+
+@media (max-width:480px) {
+    .main-container .main-wrapper .item-wrapper {
+        /* width:100%;
+        height:21.5vh; */
     }
-    .main-container header .title-container{
-        font-size:16px;
+    .main-container header .title-container {
+        font-size: 16px;
     }
-    .main-container header .input-container .search-input{
-        font-size:15px;
+    .main-container header .input-container .search-input {
+        font-size: 15px;
     }
-    .main-container .start-bg-container{
-        background-image:url('../img/marvel-bg-360x640.jpg');
+    .main-container .start-bg-container {
+        background-image: url('../img/marvel-bg-360x640.jpg');
     }
-    .main-container .start-bg-container h1{
-        font-size:34px;
+    .main-container .start-bg-container h1 {
+        font-size: 34px;
     }
 }
